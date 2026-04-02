@@ -807,13 +807,13 @@ function sendReport() {
 
   // Envoi vers Google Apps Script Web App
   var encodedData = encodeURIComponent(JSON.stringify(payload));
-var url = SHEET_URL + "?data=" + encodedData;
+  var url = SHEET_URL + "?data=" + encodedData;
 
-var img = new Image();
-img.src = url;
-setTimeout(function() {
-  showSuccess();
-}, 2000);
+  var img = new Image();
+  img.src = url;
+  setTimeout(function() {
+    showSuccess();
+  }, 2000);
 }
 
 function showSuccess() {
