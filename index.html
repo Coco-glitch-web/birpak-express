@@ -806,17 +806,14 @@ function sendReport() {
   };
 
   // Envoi vers Google Apps Script Web App
-  var form = new FormData();
-  form.append('data', JSON.stringify(payload));
+  var encodedData = encodeURIComponent(JSON.stringify(payload));
+var url = SHEET_URL + "?data=" + encodedData;
 
-  fetch(SHEET_URL, {
-    method: 'POST',
-    body: form
-  }).then(function(r) {
-    showSuccess();
-  }).catch(function() {
-    showSuccess();
-  });
+var img = new Image();
+img.src = url;
+setTimeout(function() {
+  showSuccess();
+}, 2000);
 }
 
 function showSuccess() {
