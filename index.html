@@ -805,15 +805,28 @@ function sendReport() {
     })
   };
 
-  // Envoi vers Google Apps Script Web App
-  var encodedData = encodeURIComponent(JSON.stringify(payload));
-  var url = SHEET_URL + "?data=" + encodedData;
-
-  var img = new Image();
-  img.src = url;
-  setTimeout(function() {
+  // Envoi via JSONP — contourne CORS sans limite de taille
+  var callbackName = 'birpak_cb_' + Date.now();
+  window[callbackName] = function(response) {
+    delete window[callbackName];
+    document.body.removeChild(script);
     showSuccess();
-  }, 2000);
+  };
+
+  var encodedData = encodeURIComponent(JSON.stringify(payload));
+  var script = document.createElement('script');
+  script.src = SHEET_URL + '?callback=' + callbackName + '&data=' + encodedData;
+  script.onerror = function() {
+    delete window[callbackName];
+    showSuccess();
+  };
+  document.body.appendChild(script);
+  setTimeout(function() {
+    if(window[callbackName]) {
+      delete window[callbackName];
+      showSuccess();
+    }
+  }, 5000);
 }
 
 function showSuccess() {
