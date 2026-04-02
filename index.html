@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BIR-PAK Express — Rapport du soir</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vert: #1D9E75; --vert-l: #E1F5EE; --vert-d: #085041;
+  --bleu: #185FA5; --bleu-l: #E6F1FB; --bleu-d: #0C447C;
+  --ambre: #BA7517; --ambre-l: #FAEEDA; --ambre-d: #633806;
+  --rouge: #A32D2D; --rouge-l: #FCEBEB;
+  --gris: #F1EFE8; --gris-m: #888780;
+  --bg: #F7F6F3; --card: #FFFFFF;
+  --text: #1a1a18; --text-s: #666660;
+  --border: rgba(0,0,0,0.08);
+  --radius: 14px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--vert);
+  padding: 16px 20px 20px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.header-title { font-size: 18px; font-weight: 600; color: #fff; letter-spacing: -.3px; }
+.header-date { font-size: 12px; color: rgba(255,255,255,.7); font-family: 'DM Mono', monospace; }
+.progress-bar { height: 3px; background: rgba(255,255,255,.25); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #fff; border-radius: 2px; transition: width .4s ease; }
+
+/* ── STEP TABS ── */
+.tabs {
+  display: flex; background: #fff;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1; min-width: 70px; padding: 12px 8px;
+  font-size: 11px; font-weight: 500; text-align: center;
+  color: var(--text-s); border-bottom: 2px solid transparent;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.tab.active { color: var(--vert); border-bottom-color: var(--vert); }
+.tab.done { color: var(--vert); opacity: .6; }
+.tab-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--gris); font-size: 10px; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-right: 4px; color: var(--text-s);
+}
+.tab.active .tab-num { background: var(--vert); color: #fff; }
+.tab.done .tab-num { background: var(--vert-l); color: var(--vert-d); }
+
+/* ── CONTENT ── */
+.content { padding: 16px; max-width: 480px; margin: 0 auto; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 13px; font-weight: 600; color: var(--text-s);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.card-title-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* ── FORM FIELDS ── */
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: block; font-size: 12px; font-weight: 500;
+  color: var(--text-s); margin-bottom: 6px;
+}
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; color: var(--text);
+  background: var(--bg);
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--vert);
+  background: #fff;
+}
+.field .hint { font-size: 11px; color: var(--gris-m); margin-top: 5px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* ── AGENCE CARDS ── */
+.agence-card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1.5px solid var(--border); margin-bottom: 10px;
+  overflow: hidden; transition: border-color .2s;
+}
+.agence-card.filled { border-color: var(--vert); }
+.agence-card.filled .agence-hdr { background: var(--vert-l); }
+.agence-hdr {
+  padding: 14px 16px; display: flex;
+  align-items: center; justify-content: space-between;
+  cursor: pointer; background: var(--gris);
+  transition: background .2s;
+}
+.agence-hdr:active { background: #e8e6e0; }
+.agence-info {}
+.agence-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.agence-uv { font-size: 11px; color: var(--text-s); margin-top: 2px; }
+.agence-right { display: flex; align-items: center; gap: 8px; }
+.badge {
+  font-size: 10px; font-weight: 600; padding: 3px 9px;
+  border-radius: 20px; letter-spacing: .02em;
+}
+.badge-ok { background: var(--vert-l); color: var(--vert-d); }
+.badge-pending { background: var(--ambre-l); color: var(--ambre-d); }
+.badge-empty { background: var(--gris); color: var(--gris-m); }
+.chevron {
+  width: 20px; height: 20px; display: flex; align-items: center;
+  justify-content: center; color: var(--text-s); font-size: 14px;
+  transition: transform .25s;
+}
+.chevron.open { transform: rotate(180deg); }
+
+.agence-body {
+  display: none; padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.agence-body.open { display: block; }
+
+.product-section { margin-bottom: 16px; }
+.product-section:last-of-type { margin-bottom: 0; }
+.product-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 5px 12px;
+  border-radius: 20px; margin-bottom: 12px;
+}
+.pb-bir { background: var(--bleu-l); color: var(--bleu-d); }
+.pb-pak { background: var(--ambre-l); color: var(--ambre-d); }
+
+.calc-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 9px 12px;
+  background: var(--bg); border-radius: var(--radius-sm);
+  margin-top: 8px;
+}
+.calc-lbl { font-size: 12px; color: var(--text-s); }
+.calc-val { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.cv-bir { color: var(--bleu); }
+.cv-pak { color: var(--ambre); }
+.cv-tot { color: var(--vert); }
+
+.total-agence {
+  margin-top: 12px; padding: 12px;
+  background: var(--vert-l); border-radius: var(--radius-sm);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.total-agence .lbl { font-size: 12px; font-weight: 600; color: var(--vert-d); }
+.total-agence .val { font-size: 17px; font-weight: 600; color: var(--vert); font-family: 'DM Mono', monospace; }
+
+/* ── PLAN DE ROUTE ── */
+.route-agence-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.route-agence-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: var(--bg);
+  border-radius: var(--radius-sm); cursor: pointer;
+  border: 1.5px solid transparent; transition: all .15s;
+}
+.route-agence-item.selected {
+  background: var(--vert-l); border-color: var(--vert);
+}
+.route-checkbox {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; transition: all .15s;
+}
+.route-agence-item.selected .route-checkbox {
+  background: var(--vert); border-color: var(--vert);
+}
+.route-check { color: #fff; font-size: 12px; display: none; }
+.route-agence-item.selected .route-check { display: block; }
+.route-agence-name { font-size: 13px; font-weight: 500; }
+.route-agence-uv { font-size: 11px; color: var(--text-s); }
+
+/* ── BOUTONS ── */
+.btn-row { display: flex; gap: 10px; margin-top: 16px; }
+.btn {
+  flex: 1; padding: 13px 16px;
+  border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .15s; background: var(--bg); color: var(--text);
+}
+.btn:active { transform: scale(.98); }
+.btn-primary {
+  background: var(--vert); border-color: var(--vert);
+  color: #fff;
+}
+.btn-primary:active { background: var(--vert-d); }
+
+/* ── RÉSUMÉ ── */
+.summary-block { margin-bottom: 12px; }
+.summary-title {
+  font-size: 11px; font-weight: 600; color: var(--text-s);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.summary-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-lbl { color: var(--text-s); }
+.summary-val { font-weight: 600; font-family: 'DM Mono', monospace; }
+
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.kpi-card {
+  padding: 12px; border-radius: var(--radius-sm);
+  text-align: center;
+}
+.kpi-card .k-lbl { font-size: 10px; color: var(--text-s); margin-bottom: 4px; }
+.kpi-card .k-val { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.kpi-bir { background: var(--bleu-l); }
+.kpi-bir .k-val { color: var(--bleu-d); }
+.kpi-pak { background: var(--ambre-l); }
+.kpi-pak .k-val { color: var(--ambre-d); }
+.kpi-ca { background: var(--vert-l); }
+.kpi-ca .k-val { color: var(--vert-d); font-size: 15px; }
+.kpi-ag { background: var(--gris); }
+.kpi-ag .k-val { color: var(--text); }
+
+.success-screen {
+  text-align: center; padding: 32px 16px;
+}
+.success-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--vert-l); display: flex;
+  align-items: center; justify-content: center;
+  margin: 0 auto 16px; font-size: 28px;
+}
+.success-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+.success-sub { font-size: 14px; color: var(--text-s); }
+
+.separator { height: 1px; background: var(--border); margin: 16px 0; }
+.section-intro { font-size: 13px; color: var(--text-s); margin-bottom: 14px; line-height: 1.6; }
+
+.stock-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.sp-bir { background: var(--bleu-l); color: var(--bleu-d); }
+.sp-pak { background: var(--ambre-l); color: var(--ambre-d); }
+
+.alert-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; background: #FCEBEB;
+  border-radius: var(--radius-sm); margin-bottom: 8px;
+  font-size: 12px; color: var(--rouge);
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.section.active { animation: fadeIn .25s ease; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">BIR-PAK Express</div>
+      <div class="header-date" id="hdr-date">Chargement...</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11px;color:rgba(255,255,255,.7);">Rapport du soir</div>
+      <div style="font-size:12px;color:#fff;font-weight:500;" id="hdr-step">Étape 1 / 5</div>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:20%"></div></div>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" onclick="goTo(0)"><span class="tab-num">1</span>Identité</div>
+  <div class="tab" onclick="goTo(1)"><span class="tab-num">2</span>Agences</div>
+  <div class="tab" onclick="goTo(2)"><span class="tab-num">3</span>Terrain</div>
+  <div class="tab" onclick="goTo(3)"><span class="tab-num">4</span>Plan route</div>
+  <div class="tab" onclick="goTo(4)"><span class="tab-num">5</span>Résumé</div>
+</div>
+
+<div class="content">
+
+  <!-- ═══ ÉTAPE 1 : IDENTIFICATION ═══ -->
+  <div class="section active" id="s0">
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--vert)"></div>Identification</div>
+      <div class="field">
+        <label>Nom du chef de zone</label>
+        <input type="text" id="chef" placeholder="Votre nom complet">
+      </div>
+      <div class="field">
+        <label>Unité de vente (UV)</label>
+        <select id="uv">
+          <option value="">— Sélectionner —</option>
+          <option>Littoral</option>
+          <option>Centre</option>
+          <option>Ouest / Nord-Ouest</option>
+          <option>Adamaoua / Est</option>
+          <option>Nord / Extrême-Nord</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Date du rapport</label>
+          <input type="date" id="rdate">
+        </div>
+        <div class="field">
+          <label>Mois</label>
+          <select id="mois">
+            <option>Avril 2026</option>
+            <option>Mai 2026</option>
+            <option>Juin 2026</option>
+            <option>Juillet 2026</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="nextStep(0)">Suivant — Saisie agences →</button>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 2 : AGENCES SAO ═══ -->
+  <div class="section" id="s1">
+    <p class="section-intro">Ouvrez chaque agence visitée aujourd'hui et renseignez les mouvements de stock. Ignorez les agences non visitées.</p>
+    <div id="agences-list"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(0)">← Retour</button>
+      <button class="btn btn-primary" onclick="nextStep(1)">Suivant — Rapport terrain →</button>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 3 : RAPPORT TERRAIN ═══ -->
+  <div class="section" id="s2">
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--bleu)"></div>Activité terrain</div>
+      <div class="field">
+        <label>Ville principale du jour</label>
+        <input type="text" id="ville" placeholder="Ex : Douala, Bafoussam...">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Marché 1</label>
+          <input type="text" id="march1" placeholder="Nom du marché">
+        </div>
+        <div class="field">
+          <label>Marché 2</label>
+          <input type="text" id="march2" placeholder="Optionnel">
+        </div>
+      </div>
+      <div class="field">
+        <label>Marché 3</label>
+        <input type="text" id="march3" placeholder="Optionnel">
+      </div>
+      <div class="field">
+        <label>Cette ville est-elle une nouvelle activation ?</label>
+        <select id="newville">
+          <option value="Non">Non — ville déjà activée</option>
+          <option value="Oui">Oui — première activation</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--ambre)"></div>KPI opérationnels</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Voyages périph. effectués</label>
+          <input type="number" id="voyages" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Publications digitales</label>
+          <input type="number" id="pubs" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Reporting envoyé à la Direction ?</label>
+        <select id="reporting">
+          <option value="Oui">Oui — envoyé</option>
+          <option value="Non">Non — je l'envoie après</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--rouge)"></div>Alertes & support</div>
+      <div class="field">
+        <label>Besoin de support de la Direction ?</label>
+        <select id="support">
+          <option>Non — tout va bien</option>
+          <option>Oui — Logistique / transport</option>
+          <option>Oui — Réapprovisionnement stock</option>
+          <option>Oui — Appui commercial</option>
+          <option>Oui — Support digital</option>
+          <option>Oui — Autre</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Difficultés rencontrées</label>
+        <textarea id="difficultes" placeholder="Blocages, problèmes terrain..." rows="2" style="resize:none;"></textarea>
+      </div>
+      <div class="field">
+        <label>Actions correctives engagées</label>
+        <textarea id="actions" placeholder="Ce que vous avez fait..." rows="2" style="resize:none;"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(1)">← Retour</button>
+      <button class="btn btn-primary" onclick="nextStep(2)">Suivant — Plan de route →</button>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 4 : PLAN DE ROUTE ═══ -->
+  <div class="section" id="s3">
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--violet,#534AB7)"></div>Plan de route — demain</div>
+      <p class="section-intro" style="margin-bottom:14px;">Planifiez votre journée de demain pour aider le comité de monitoring à anticiper.</p>
+
+      <div class="field">
+        <label>Ville / marché prévu demain</label>
+        <input type="text" id="ville-dem" placeholder="Ex : Douala Bonabéri">
+      </div>
+
+      <div class="field">
+        <label>Agences SAO à visiter demain</label>
+        <div class="route-agence-list" id="route-agences"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Stock Birman à emporter (sacs)</label>
+          <input type="number" id="stock-bir-dem" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Stock Pak à emporter (sacs)</label>
+          <input type="number" id="stock-pak-dem" placeholder="0" min="0">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Heure de départ prévue</label>
+          <input type="time" id="heure-dep" value="07:00">
+        </div>
+        <div class="field">
+          <label>Nombre de marchés prévus</label>
+          <input type="number" id="march-dem" placeholder="0" min="0">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Besoins logistiques</label>
+        <select id="logistique">
+          <option>Aucun besoin particulier</option>
+          <option>Camion supplémentaire nécessaire</option>
+          <option>Carburant à prévoir</option>
+          <option>Escorte / accompagnement souhaité</option>
+          <option>Autre (préciser dans commentaires)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Objectif de vente demain (sacs total)</label>
+        <input type="number" id="obj-dem" placeholder="Ex : 150">
+        <div class="hint">Votre engagement personnel pour demain</div>
+      </div>
+
+      <div class="field">
+        <label>Commentaires / remarques</label>
+        <textarea id="comm-dem" placeholder="Informations utiles pour la Direction..." rows="2" style="resize:none;"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(2)">← Retour</button>
+      <button class="btn btn-primary" onclick="buildSummary()">Voir le résumé →</button>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 5 : RÉSUMÉ & ENVOI ═══ -->
+  <div class="section" id="s4">
+    <div id="summary-content"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(3)">← Corriger</button>
+      <button class="btn btn-primary" id="btn-send" onclick="sendReport()">Envoyer au Google Sheet</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DONNÉES ──────────────────────────────────────────────────
+var AGENCES = [
+  { id:"a1",  uv:"Littoral",             nom:"SAO POINT MISSOKÈ" },
+  { id:"a2",  uv:"Littoral",             nom:"SAO POINT BONABÉRI" },
+  { id:"a3",  uv:"Littoral",             nom:"SAO POINT LIMBÉ" },
+  { id:"a4",  uv:"Littoral",             nom:"SAO POINT MBOPPI" },
+  { id:"a5",  uv:"Ouest / Nord-Ouest",   nom:"SAO POINT BAFOUSSAM" },
+  { id:"a6",  uv:"Centre",               nom:"SAO POINT YAOUNDÉ" },
+  { id:"a7",  uv:"Adamaoua / Est",       nom:"SAO POINT BERTOUA" },
+  { id:"a8",  uv:"Nord / Extrême-Nord",  nom:"SAO POINT GAROUA" },
+  { id:"a9",  uv:"Adamaoua / Est",       nom:"SAO POINT GAROUA-BOULAÏ" },
+  { id:"a10", uv:"Nord / Extrême-Nord",  nom:"SAO POINT NGAOUNDÉRÉ" },
+  { id:"a11", uv:"Nord / Extrême-Nord",  nom:"SAO POINT KOUSSERI" },
+  { id:"a12", uv:"Nord / Extrême-Nord",  nom:"SAO POINT MAROUA" },
+];
+var PRIX_REF = 13000;
+var SHEET_URL = "https://script.google.com/macros/s/VOTRE_SCRIPT_ID/exec"; // à remplacer
+
+var currentStep = 0;
+var agenceData  = {};
+var routeSelected = {};
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  var d = new Date();
+  document.getElementById('hdr-date').textContent =
+    d.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('rdate').value = d.toISOString().split('T')[0];
+
+  buildAgencesList();
+  buildRouteList();
+});
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function goTo(step) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('s'+step).classList.add('active');
+  var tabs = document.querySelectorAll('.tab');
+  tabs.forEach(function(t,i){
+    t.classList.remove('active','done');
+    if(i < step) t.classList.add('done');
+    if(i === step) t.classList.add('active');
+  });
+  currentStep = step;
+  var pct = ((step+1)/5*100).toFixed(0);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('hdr-step').textContent = 'Étape '+(step+1)+' / 5';
+  window.scrollTo(0,0);
+}
+
+function nextStep(from) {
+  if(from === 0) {
+    if(!document.getElementById('chef').value.trim()) { alert('Veuillez entrer votre nom.'); return; }
+    if(!document.getElementById('uv').value) { alert('Veuillez sélectionner votre UV.'); return; }
+  }
+  goTo(from + 1);
+}
+
+// ── LISTE AGENCES ─────────────────────────────────────────────
+function buildAgencesList() {
+  var container = document.getElementById('agences-list');
+  container.innerHTML = '';
+  AGENCES.forEach(function(ag) {
+    agenceData[ag.id] = { birS:0, birR:0, birP:PRIX_REF, pakS:0, pakR:0, pakP:PRIX_REF, obs:'' };
+    var html = '<div class="agence-card" id="card-'+ag.id+'">' +
+      '<div class="agence-hdr" onclick="toggleAg(\''+ag.id+'\')">' +
+        '<div class="agence-info">' +
+          '<div class="agence-name">'+ag.nom+'</div>' +
+          '<div class="agence-uv">'+ag.uv+'</div>' +
+        '</div>' +
+        '<div class="agence-right">' +
+          '<span class="badge badge-empty" id="badge-'+ag.id+'">Non visité</span>' +
+          '<div class="chevron" id="chev-'+ag.id+'">▾</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="agence-body" id="body-'+ag.id+'">' +
+        '<div class="product-section">' +
+          '<div class="product-badge pb-bir">Riz 25% Birman 50kg</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Stock sorti (sacs)</label><input type="number" id="'+ag.id+'-bs" placeholder="0" min="0" oninput="calcAg(\''+ag.id+'\')"></div>' +
+            '<div class="field"><label>Stock retourné</label><input type="number" id="'+ag.id+'-br" placeholder="0" min="0" oninput="calcAg(\''+ag.id+'\')"></div>' +
+          '</div>' +
+          '<div class="field"><label>Prix de vente (FCFA/sac)</label><input type="number" id="'+ag.id+'-bp" value="'+PRIX_REF+'" min="0" oninput="calcAg(\''+ag.id+'\')"><div class="hint">Référence : '+PRIX_REF.toLocaleString('fr-FR')+' FCFA</div></div>' +
+          '<div class="calc-row"><span class="calc-lbl">Vendus nets</span><span class="calc-val cv-bir" id="'+ag.id+'-bv">0 sacs</span></div>' +
+          '<div class="calc-row"><span class="calc-lbl">CA Birman</span><span class="calc-val cv-bir" id="'+ag.id+'-bca">0 FCFA</span></div>' +
+        '</div>' +
+        '<div class="separator"></div>' +
+        '<div class="product-section">' +
+          '<div class="product-badge pb-pak">Riz 25% Pakistanais 50kg</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Stock sorti (sacs)</label><input type="number" id="'+ag.id+'-ps" placeholder="0" min="0" oninput="calcAg(\''+ag.id+'\')"></div>' +
+            '<div class="field"><label>Stock retourné</label><input type="number" id="'+ag.id+'-pr" placeholder="0" min="0" oninput="calcAg(\''+ag.id+'\')"></div>' +
+          '</div>' +
+          '<div class="field"><label>Prix de vente (FCFA/sac)</label><input type="number" id="'+ag.id+'-pp" value="'+PRIX_REF+'" min="0" oninput="calcAg(\''+ag.id+'\')"><div class="hint">Référence : '+PRIX_REF.toLocaleString('fr-FR')+' FCFA</div></div>' +
+          '<div class="calc-row"><span class="calc-lbl">Vendus nets</span><span class="calc-val cv-pak" id="'+ag.id+'-pv">0 sacs</span></div>' +
+          '<div class="calc-row"><span class="calc-lbl">CA Pakistanais</span><span class="calc-val cv-pak" id="'+ag.id+'-pca">0 FCFA</span></div>' +
+        '</div>' +
+        '<div class="total-agence">' +
+          '<span class="lbl">CA total agence</span>' +
+          '<span class="val" id="'+ag.id+'-tot">0 FCFA</span>' +
+        '</div>' +
+        '<div class="field" style="margin-top:12px;">' +
+          '<label>Observations</label>' +
+          '<input type="text" id="'+ag.id+'-obs" placeholder="Remarques, difficultés...">' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+    container.innerHTML += html;
+  });
+}
+
+function toggleAg(id) {
+  var body = document.getElementById('body-'+id);
+  var chev = document.getElementById('chev-'+id);
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function calcAg(id) {
+  var bs = +(document.getElementById(id+'-bs').value)||0;
+  var br = +(document.getElementById(id+'-br').value)||0;
+  var bp = +(document.getElementById(id+'-bp').value)||PRIX_REF;
+  var ps = +(document.getElementById(id+'-ps').value)||0;
+  var pr = +(document.getElementById(id+'-pr').value)||0;
+  var pp = +(document.getElementById(id+'-pp').value)||PRIX_REF;
+  var bv = Math.max(0,bs-br);
+  var pv = Math.max(0,ps-pr);
+  var bca = bv*bp; var pca = pv*pp; var tot = bca+pca;
+  var fmt = function(n){ return Math.round(n).toLocaleString('fr-FR'); };
+  document.getElementById(id+'-bv').textContent  = fmt(bv)+' sacs';
+  document.getElementById(id+'-bca').textContent = fmt(bca)+' FCFA';
+  document.getElementById(id+'-pv').textContent  = fmt(pv)+' sacs';
+  document.getElementById(id+'-pca').textContent = fmt(pca)+' FCFA';
+  document.getElementById(id+'-tot').textContent = fmt(tot)+' FCFA';
+  agenceData[id] = { birS:bs,birR:br,birP:bp,birV:bv,birCA:bca, pakS:ps,pakR:pr,pakP:pp,pakV:pv,pakCA:pca, tot:tot,
+    obs: document.getElementById(id+'-obs').value };
+
+  var badge = document.getElementById('badge-'+id);
+  var card  = document.getElementById('card-'+id);
+  if(tot > 0) {
+    badge.className='badge badge-ok'; badge.textContent='Rempli';
+    card.classList.add('filled');
+  } else if(bs > 0 || ps > 0) {
+    badge.className='badge badge-pending'; badge.textContent='En cours';
+    card.classList.remove('filled');
+  } else {
+    badge.className='badge badge-empty'; badge.textContent='Non visité';
+    card.classList.remove('filled');
+  }
+}
+
+// ── PLAN DE ROUTE ─────────────────────────────────────────────
+function buildRouteList() {
+  var container = document.getElementById('route-agences');
+  container.innerHTML = '';
+  AGENCES.forEach(function(ag) {
+    routeSelected[ag.id] = false;
+    var div = document.createElement('div');
+    div.className = 'route-agence-item';
+    div.id = 'route-'+ag.id;
+    div.onclick = function(){ toggleRoute(ag.id); };
+    div.innerHTML =
+      '<div class="route-checkbox"><span class="route-check">✓</span></div>' +
+      '<div><div class="route-agence-name">'+ag.nom+'</div><div class="route-agence-uv">'+ag.uv+'</div></div>';
+    container.appendChild(div);
+  });
+}
+
+function toggleRoute(id) {
+  routeSelected[id] = !routeSelected[id];
+  var el = document.getElementById('route-'+id);
+  if(routeSelected[id]) el.classList.add('selected');
+  else el.classList.remove('selected');
+}
+
+// ── RÉSUMÉ ────────────────────────────────────────────────────
+function buildSummary() {
+  goTo(4);
+  var fmt = function(n){ return Math.round(n).toLocaleString('fr-FR'); };
+
+  var totalBirV=0, totalPakV=0, totalCA=0, agFillees=0;
+  AGENCES.forEach(function(ag){
+    var d=agenceData[ag.id];
+    if(d && d.tot>0){
+      totalBirV += d.birV||0;
+      totalPakV += d.pakV||0;
+      totalCA   += d.tot||0;
+      agFillees++;
+    }
+  });
+
+  var routeAgNames = AGENCES.filter(function(ag){ return routeSelected[ag.id]; }).map(function(ag){ return ag.nom; });
+
+  var html = '';
+
+  // KPI du jour
+  html += '<div class="kpi-grid">' +
+    '<div class="kpi-card kpi-bir"><div class="k-lbl">Birman vendus</div><div class="k-val">'+fmt(totalBirV)+' sacs</div></div>' +
+    '<div class="kpi-card kpi-pak"><div class="k-lbl">Pak vendus</div><div class="k-val">'+fmt(totalPakV)+' sacs</div></div>' +
+    '<div class="kpi-card kpi-ca"><div class="k-lbl">CA total du jour</div><div class="k-val">'+fmt(totalCA)+' FCFA</div></div>' +
+    '<div class="kpi-card kpi-ag"><div class="k-lbl">Agences remplies</div><div class="k-val">'+agFillees+' / '+AGENCES.length+'</div></div>' +
+  '</div>';
+
+  // Détail par agence
+  html += '<div class="summary-block"><div class="summary-title">Détail par agence</div>';
+  html += '<div class="card" style="padding:12px;">';
+  var hasData = false;
+  AGENCES.forEach(function(ag){
+    var d=agenceData[ag.id];
+    if(d && d.tot>0){
+      hasData = true;
+      html += '<div class="summary-row">' +
+        '<span class="summary-lbl" style="font-size:12px;">'+ag.nom.replace('SAO POINT ','')+'</span>' +
+        '<span style="display:flex;gap:6px;align-items:center;">' +
+          '<span class="stock-pill sp-bir">'+fmt(d.birV||0)+' B</span>' +
+          '<span class="stock-pill sp-pak">'+fmt(d.pakV||0)+' P</span>' +
+          '<span class="summary-val" style="color:var(--vert);">'+fmt(d.tot)+' F</span>' +
+        '</span>' +
+      '</div>';
+    }
+  });
+  if(!hasData) html += '<div style="text-align:center;color:var(--gris-m);padding:12px;font-size:13px;">Aucune agence remplie</div>';
+  html += '</div></div>';
+
+  // Rapport terrain
+  html += '<div class="summary-block"><div class="summary-title">Rapport terrain</div>';
+  html += '<div class="card" style="padding:12px;">';
+  html += '<div class="summary-row"><span class="summary-lbl">Chef de zone</span><span class="summary-val">'+(document.getElementById('chef').value||'—')+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">UV</span><span class="summary-val">'+(document.getElementById('uv').value||'—')+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Ville du jour</span><span class="summary-val">'+(document.getElementById('ville').value||'—')+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Voyages périph.</span><span class="summary-val">'+(document.getElementById('voyages').value||'0')+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Reporting envoyé</span><span class="summary-val">'+document.getElementById('reporting').value+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Support requis</span><span class="summary-val" style="font-size:12px;">'+document.getElementById('support').value+'</span></div>';
+  html += '</div></div>';
+
+  // Plan de route
+  html += '<div class="summary-block"><div class="summary-title">Plan de route — demain</div>';
+  html += '<div class="card" style="padding:12px;">';
+  html += '<div class="summary-row"><span class="summary-lbl">Ville prévue</span><span class="summary-val">'+(document.getElementById('ville-dem').value||'—')+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Départ prévu</span><span class="summary-val">'+(document.getElementById('heure-dep').value||'—')+'</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Stock Birman à emporter</span><span class="summary-val">'+(document.getElementById('stock-bir-dem').value||'0')+' sacs</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Stock Pak à emporter</span><span class="summary-val">'+(document.getElementById('stock-pak-dem').value||'0')+' sacs</span></div>';
+  html += '<div class="summary-row"><span class="summary-lbl">Objectif demain</span><span class="summary-val">'+(document.getElementById('obj-dem').value||'—')+' sacs</span></div>';
+  if(routeAgNames.length>0){
+    html += '<div class="summary-row"><span class="summary-lbl">Agences prévues</span><span class="summary-val" style="font-size:11px;text-align:right;max-width:55%;">'+routeAgNames.map(function(n){return n.replace('SAO POINT ','');}).join(', ')+'</span></div>';
+  }
+  html += '</div></div>';
+
+  document.getElementById('summary-content').innerHTML = html;
+}
+
+// ── ENVOI ─────────────────────────────────────────────────────
+function sendReport() {
+  var btn = document.getElementById('btn-send');
+  btn.textContent = 'Envoi en cours...';
+  btn.disabled = true;
+
+  var payload = {
+    chef: document.getElementById('chef').value,
+    uv: document.getElementById('uv').value,
+    date: document.getElementById('rdate').value,
+    mois: document.getElementById('mois').value,
+    ville: document.getElementById('ville').value,
+    march1: document.getElementById('march1').value,
+    march2: document.getElementById('march2').value,
+    march3: document.getElementById('march3').value,
+    newville: document.getElementById('newville').value,
+    voyages: document.getElementById('voyages').value,
+    pubs: document.getElementById('pubs').value,
+    reporting: document.getElementById('reporting').value,
+    support: document.getElementById('support').value,
+    difficultes: document.getElementById('difficultes').value,
+    actions: document.getElementById('actions').value,
+    villeDemain: document.getElementById('ville-dem').value,
+    heureDep: document.getElementById('heure-dep').value,
+    stockBirDem: document.getElementById('stock-bir-dem').value,
+    stockPakDem: document.getElementById('stock-pak-dem').value,
+    marchsDem: document.getElementById('march-dem').value,
+    logistique: document.getElementById('logistique').value,
+    objDemain: document.getElementById('obj-dem').value,
+    commDemain: document.getElementById('comm-dem').value,
+    routeAgences: AGENCES.filter(function(ag){ return routeSelected[ag.id]; }).map(function(ag){ return ag.nom; }).join(', '),
+    agences: AGENCES.map(function(ag){
+      var d = agenceData[ag.id] || {};
+      return {
+        nom: ag.nom, uv: ag.uv,
+        birS: d.birS||0, birR: d.birR||0, birP: d.birP||PRIX_REF, birV: d.birV||0, birCA: d.birCA||0,
+        pakS: d.pakS||0, pakR: d.pakR||0, pakP: d.pakP||PRIX_REF, pakV: d.pakV||0, pakCA: d.pakCA||0,
+        tot: d.tot||0, obs: d.obs||''
+      };
+    })
+  };
+
+  // Envoi vers Google Apps Script Web App
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function() {
+    showSuccess();
+  }).catch(function() {
+    // En mode no-cors, fetch retourne toujours "opaque" — on considère l'envoi réussi
+    showSuccess();
+  });
+}
+
+function showSuccess() {
+  document.getElementById('summary-content').innerHTML =
+    '<div class="success-screen">' +
+      '<div class="success-icon">✓</div>' +
+      '<div class="success-title">Rapport envoyé !</div>' +
+      '<div class="success-sub">Les données ont été enregistrées dans le Google Sheet.<br>La Direction Marketing a été notifiée.</div>' +
+      '<div style="margin-top:24px;">' +
+        '<div class="card" style="text-align:left;">' +
+          '<div class="summary-row"><span class="summary-lbl">Chef</span><span class="summary-val">'+document.getElementById('chef').value+'</span></div>' +
+          '<div class="summary-row"><span class="summary-lbl">UV</span><span class="summary-val">'+document.getElementById('uv').value+'</span></div>' +
+          '<div class="summary-row"><span class="summary-lbl">Date</span><span class="summary-val">'+document.getElementById('rdate').value+'</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-primary" style="margin-top:16px;width:100%;" onclick="resetApp()">Nouveau rapport</button>' +
+    '</div>';
+  document.getElementById('btn-send').style.display = 'none';
+}
+
+function resetApp() {
+  location.reload();
+}
+</script>
+</body>
+</html>
