@@ -318,12 +318,11 @@ body {
       <div class="field">
         <label>Unité de vente (UV)</label>
         <select id="uv">
-          <option value="">— Sélectionner —</option>
-          <option>Littoral</option>
-          <option>Centre</option>
-          <option>Ouest / Nord-Ouest</option>
-          <option>Adamaoua / Est</option>
-          <option>Nord / Extrême-Nord</option>
+          <option value="Littoral">Littoral</option>
+          <option value="Centre">Centre</option>
+          <option value="Ouest / Nord-Ouest">Ouest / Nord-Ouest</option>
+          <option value="Adamaoua / Est">Adamaoua / Est</option>
+          <option value="Nord / Extrême-Nord">Nord / Extrême-Nord</option>
         </select>
       </div>
       <div class="field-row">
@@ -529,7 +528,7 @@ var AGENCES = [
   { id:"a12", uv:"Nord / Extrême-Nord",  nom:"SAO POINT MAROUA" },
 ];
 var PRIX_REF = 13000;
-var SHEET_URL = "https://script.google.com/macros/s/var SHEET_URL = "https://script.google.com/macros/s/AKfycbzhuYO0oakR0SfJRWiqCozbhGu0lTErzLE0Q2GF6R47oAn_bUElM3yR-aGQNowFI4Om/exec";/exec"; // à remplacer
+var SHEET_URL = "https://script.google.com/macros/s/VOTRE_SCRIPT_ID/exec"; // à remplacer
 
 var currentStep = 0;
 var agenceData  = {};
@@ -565,8 +564,7 @@ function goTo(step) {
 
 function nextStep(from) {
   if(from === 0) {
-    if(!document.getElementById('chef').value.trim()) { alert('Veuillez entrer votre nom.'); return; }
-    if(!document.getElementById('uv').value) { alert('Veuillez sélectionner votre UV.'); return; }
+    if(!document.getElementById('chef').value.trim()) { alert('Veuillez entrer votre nom complet.'); return; }
   }
   goTo(from + 1);
 }
