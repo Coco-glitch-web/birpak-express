@@ -805,28 +805,68 @@ function sendReport() {
     })
   };
 
-  // Envoi via JSONP — contourne CORS sans limite de taille
-  var callbackName = 'birpak_cb_' + Date.now();
-  window[callbackName] = function(response) {
-    delete window[callbackName];
-    document.body.removeChild(script);
-    showSuccess();
+  // Envoi séparé : rapport général + chaque agence individuellement
+  var rapportData = {
+    chef: payload.chef, uv: payload.uv, mois: payload.mois,
+    date: payload.date, ville: payload.ville,
+    march1: payload.march1, march2: payload.march2, march3: payload.march3,
+    newville: payload.newville, voyages: payload.voyages,
+    support: payload.support, difficultes: payload.difficultes,
+    actions: payload.actions, villeDemain: payload.villeDemain,
+    routeAgences: payload.routeAgences,
+    birT: 0, birS: 0, pakT: 0, pakS: 0, ca: 0
   };
 
-  var encodedData = encodeURIComponent(JSON.stringify(payload));
-  var script = document.createElement('script');
-  script.src = SHEET_URL + '?callback=' + callbackName + '&data=' + encodedData;
-  script.onerror = function() {
-    delete window[callbackName];
-    showSuccess();
-  };
-  document.body.appendChild(script);
-  setTimeout(function() {
-    if(window[callbackName]) {
-      delete window[callbackName];
-      showSuccess();
-    }
-  }, 5000);
+  // Calculer les totaux
+  if(payload.agences) {
+    payload.agences.forEach(function(ag) {
+      if(ag.tot > 0) {
+        rapportData.birS += ag.birV || 0;
+        rapportData.pakS += ag.pakV || 0;
+        rapportData.ca  += ag.tot  || 0;
+      }
+    });
+    rapportData.birT = rapportData.birS / 20;
+    rapportData.pakT = rapportData.pakS / 20;
+  }
+
+  var queue = [];
+
+  // 1. Rapport général
+  queue.push({ type: 'rapport', data: rapportData });
+
+  // 2. Une entrée par agence avec des ventes
+  if(payload.agences) {
+    payload.agences.forEach(function(ag) {
+      if(ag.birS > 0 || ag.pakS > 0) {
+        queue.push({ type: 'agence', data: {
+          date: payload.date, chef: payload.chef, uv: payload.uv,
+          nom: ag.nom, uv: ag.uv,
+          birS: ag.birS, birR: ag.birR, birV: ag.birV, birP: ag.birP, birCA: ag.birCA,
+          pakS: ag.pakS, pakR: ag.pakR, pakV: ag.pakV, pakP: ag.pakP, pakCA: ag.pakCA,
+          tot: ag.tot, obs: ag.obs
+        }});
+      }
+    });
+  }
+
+  // Envoyer chaque élément de la queue via JSONP
+  var idx = 0;
+  function sendNext() {
+    if(idx >= queue.length) { showSuccess(); return; }
+    var item = queue[idx++];
+    var cbName = 'birpak_cb_' + Date.now() + '_' + idx;
+    window[cbName] = function() { delete window[cbName]; setTimeout(sendNext, 200); };
+    var s = document.createElement('script');
+    s.src = SHEET_URL + '?callback=' + cbName + '&type=' + item.type +
+            '&data=' + encodeURIComponent(JSON.stringify(item.data));
+    s.onerror = function() { delete window[cbName]; setTimeout(sendNext, 200); };
+    document.body.appendChild(s);
+    setTimeout(function() {
+      if(window[cbName]) { delete window[cbName]; sendNext(); }
+    }, 4000);
+  }
+  sendNext();
 }
 
 function showSuccess() {
