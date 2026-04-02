@@ -806,15 +806,15 @@ function sendReport() {
   };
 
   // Envoi vers Google Apps Script Web App
+  var form = new FormData();
+  form.append('data', JSON.stringify(payload));
+
   fetch(SHEET_URL, {
     method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(function() {
+    body: form
+  }).then(function(r) {
     showSuccess();
   }).catch(function() {
-    // En mode no-cors, fetch retourne toujours "opaque" — on considère l'envoi réussi
     showSuccess();
   });
 }
